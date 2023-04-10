@@ -17,6 +17,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
     private final Logger logger = LoggerFactory.getLogger("bftsmart");
     private final ServiceReplica replica;
     private TreeMap<K, V> replicaMap;
+    private long coinID = 1L;
 
     //The constructor passes the id of the server to the super class
     public BFTMapServer(int id) {
