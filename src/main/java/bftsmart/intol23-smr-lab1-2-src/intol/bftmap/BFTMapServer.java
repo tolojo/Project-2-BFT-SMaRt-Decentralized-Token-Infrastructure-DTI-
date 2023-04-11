@@ -9,7 +9,6 @@ import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.util.TreeMap;
 
@@ -17,11 +16,15 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
     private final Logger logger = LoggerFactory.getLogger("bftsmart");
     private final ServiceReplica replica;
     private TreeMap<K, V> replicaMap;
+    private TreeMap<K, V> nftMap;
+    
     private long coinID = 1L;
+    private long nftID = 1L;
 
     //The constructor passes the id of the server to the super class
     public BFTMapServer(int id) {
         replicaMap = new TreeMap<>();
+        nftMap = new TreeMap<>();
         replica = new ServiceReplica(id, this, this);
     }
 
@@ -47,10 +50,12 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                 case PUT:
                     V oldValue = replicaMap.put(request.getKey(), request.getValue());
 
-                    if (oldValue != null) {
+                    if(oldValue != null) {
                         response.setValue(oldValue);
                     }
                     return BFTMapMessage.toBytes(response);
+                case MINT_NFT:
+
                 case SIZE:
                     
                 case REMOVE:

@@ -41,7 +41,11 @@ public class BFTMapInteractiveClient {
                 bftMap.put(key, value);
 
                 System.out.println("\nkey-value pair added to the map\n");
-            } else if (cmd.equalsIgnoreCase("GET")) {
+            }else if (cmd.equalsIgnoreCase("MINT_NFT")){
+                
+
+            } 
+            else if (cmd.equalsIgnoreCase("GET")) {
 
                 int key;
                 try {
