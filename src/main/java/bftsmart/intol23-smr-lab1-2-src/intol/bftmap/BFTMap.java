@@ -72,7 +72,6 @@ public class BFTMap<K, V> implements Map<K, V> {
             request.setType(BFTMapRequestType.PUT);
             request.setKey(key);
             request.setValue(value);
-
             //invokes BFT-SMaRt
             rep = serviceProxy.invokeOrdered(BFTMapMessage.toBytes(request));
         } catch (IOException e) {

@@ -16,15 +16,12 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
     private final Logger logger = LoggerFactory.getLogger("bftsmart");
     private final ServiceReplica replica;
     private TreeMap<K, V> replicaMap;
-    private TreeMap<K, V> nftMap;
-    
     private long coinID = 1L;
     private long nftID = 1L;
 
     //The constructor passes the id of the server to the super class
     public BFTMapServer(int id) {
         replicaMap = new TreeMap<>();
-        nftMap = new TreeMap<>();
         replica = new ServiceReplica(id, this, this);
     }
 
@@ -44,7 +41,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
             BFTMapRequestType cmd = request.getType();
 
             logger.info("Ordered execution of a {} request from {}", cmd, msgCtx.getSender());
-
+            System.out.println(cmd);
             switch (cmd) {
                 //write operations on the map
                 case PUT:
@@ -54,8 +51,6 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         response.setValue(oldValue);
                     }
                     return BFTMapMessage.toBytes(response);
-                case MINT_NFT:
-
                 case SIZE:
                     
                 case REMOVE:

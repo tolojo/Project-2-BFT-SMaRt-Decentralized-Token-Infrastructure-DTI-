@@ -6,18 +6,21 @@ package intol.bftmap;
 
 import java.io.Console;
 import java.io.IOException;
+import bftsmart.dti.nft;
 
 public class BFTMapInteractiveClient {
 
     public static void main(String[] args) throws IOException {
+        int local_key = 0;
         int clientId = (args.length > 0) ? Integer.parseInt(args[0]) : 1001;
-        BFTMap<Integer, String> bftMap = new BFTMap<>(clientId);
+        BFTMap<Integer, Object> bftMap = new BFTMap<>(clientId);
 
         Console console = System.console();
 
         System.out.println("\nCommands:\n");
         System.out.println("\tPUT: Insert value into the map");
         System.out.println("\tGET: Retrieve value from the map");
+        System.out.println("\tMINT_NFT: Mint an NFT");
         System.out.println("\tSIZE: Retrieve the size of the map");
         System.out.println("\tREMOVE: Removes the value associated with the supplied key");
         System.out.println("\tKEYSET: List all keys available in the table");
@@ -43,6 +46,16 @@ public class BFTMapInteractiveClient {
                 System.out.println("\nkey-value pair added to the map\n");
             }else if (cmd.equalsIgnoreCase("MINT_NFT")){
                 
+                
+                String name = console.readLine("Enter the name of the nft: ");
+
+                String uri = console.readLine("Enter the URI of the nft: ");
+                String nft = clientId + "|" + name +"|" + uri; 
+                //invokes the op on the servers
+                bftMap.put(local_key, nft);
+
+                System.out.println("\nkey-value pair added to the map\n");
+                local_key+=1;
 
             } 
             else if (cmd.equalsIgnoreCase("GET")) {
@@ -56,9 +69,9 @@ public class BFTMapInteractiveClient {
                 }
 
                 //invokes the op on the servers
-                String value = bftMap.get(key);
+               // String value = bftMap.get(key);
 
-                System.out.println("\nValue associated with " + key + ": " + value + "\n");
+               // System.out.println("\nValue associated with " + key + ": " + value + "\n");
 
             } else if (cmd.equalsIgnoreCase("KEYSET")) {
 
