@@ -6,6 +6,8 @@ package intol.bftmap;
 
 import java.io.Console;
 import java.io.IOException;
+import java.util.Set;
+
 import bftsmart.dti.nft;
 
 public class BFTMapInteractiveClient {
@@ -23,7 +25,7 @@ public class BFTMapInteractiveClient {
         System.out.println("\tMINT_NFT: Mint an NFT");
         System.out.println("\tSIZE: Retrieve the size of the map");
         System.out.println("\tREMOVE: Removes the value associated with the supplied key");
-        System.out.println("\tKEYSET: List all keys available in the table");
+        System.out.println("\tMY_NFTS: List of all NFTS");
         System.out.println("\tEXIT: Terminate this client\n");
 
         while (true) {
@@ -46,7 +48,6 @@ public class BFTMapInteractiveClient {
                 System.out.println("\nkey-value pair added to the map\n");
             }else if (cmd.equalsIgnoreCase("MINT_NFT")){
                 
-                
                 String name = console.readLine("Enter the name of the nft: ");
 
                 String uri = console.readLine("Enter the URI of the nft: ");
@@ -57,8 +58,7 @@ public class BFTMapInteractiveClient {
                 System.out.println("\nkey-value pair added to the map\n");
                 local_key+=1;
 
-            } 
-            else if (cmd.equalsIgnoreCase("GET")) {
+            } else if (cmd.equalsIgnoreCase("GET")) {
 
                 int key;
                 try {
@@ -69,11 +69,27 @@ public class BFTMapInteractiveClient {
                 }
 
                 //invokes the op on the servers
-               // String value = bftMap.get(key);
+                //String value = bftMap.get(key);
 
-               // System.out.println("\nValue associated with " + key + ": " + value + "\n");
+                //System.out.println("\nValue associated with " + key + ": " + value + "\n");
 
-            } else if (cmd.equalsIgnoreCase("KEYSET")) {
+            } else if (cmd.equalsIgnoreCase("MY_NFTS")) {
+                Set<Integer> keys = bftMap.keySet();
+                System.out.println("\nKeys in the map:");
+
+                for (int key : keys) {
+                    String nft = (String) bftMap.get(key);
+                    String[] nftTokens = nft.split("\\|");
+                    String name = nftTokens[1];
+                    String uri = nftTokens[2];
+                    System.out.println("Key " + key + " -> name: " + name + " URI: " + uri );
+                }
+                
+            } else if (cmd.equalsIgnoreCase("MY_NFT_REQUESTS")) {
+
+                System.out.println("\tYou are supposed to implement this command :)\n");
+
+            } else if (cmd.equalsIgnoreCase("PROCESS_NFT_TRANSFER")) {
 
                 System.out.println("\tYou are supposed to implement this command :)\n");
 

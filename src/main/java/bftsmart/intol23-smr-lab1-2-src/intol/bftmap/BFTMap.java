@@ -103,7 +103,29 @@ public class BFTMap<K, V> implements Map<K, V> {
 
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException("You are supposed to implement this method :)");
+        byte[] rep;
+        try {
+            BFTMapMessage<K,V> request = new BFTMapMessage<>();
+            request.setType(BFTMapRequestType.KEYSET);
+
+            //invokes BFT-SMaRt
+            rep = serviceProxy.invokeUnordered(BFTMapMessage.toBytes(request));
+        } catch (IOException e) {
+            logger.error("Failed to send KEYSET request");
+            return null;
+        }
+
+        if (rep.length == 0) {
+            return null;
+        }
+
+        try {
+            BFTMapMessage<K,V> response = BFTMapMessage.fromBytes(rep);
+            return response.getKeySet();
+        } catch (ClassNotFoundException | IOException ex) {
+            logger.error("Failed to deserialized response of KEYSET request");
+            return null;
+        }
     }
 
     @Override

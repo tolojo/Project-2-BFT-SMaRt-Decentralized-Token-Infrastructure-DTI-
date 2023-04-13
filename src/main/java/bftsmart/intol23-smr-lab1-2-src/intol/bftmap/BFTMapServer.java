@@ -10,6 +10,7 @@ import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
@@ -54,8 +55,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                 case SIZE:
                     
                 case REMOVE:
-                    
-                case KEYSET:
+
                     
             }
 
@@ -83,6 +83,12 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     if (ret != null) {
                         response.setValue(ret);
                     }
+                    return BFTMapMessage.toBytes(response);
+                
+                case KEYSET:
+                    Set<K> keySet = replicaMap.keySet();
+                    response.setKeySet(keySet);
+
                     return BFTMapMessage.toBytes(response);
             }
         } catch (IOException | ClassNotFoundException ex) {
