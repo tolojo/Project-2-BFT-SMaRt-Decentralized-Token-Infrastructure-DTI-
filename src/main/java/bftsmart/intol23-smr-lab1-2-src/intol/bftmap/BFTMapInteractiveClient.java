@@ -165,6 +165,7 @@ public class BFTMapInteractiveClient {
             } else if (cmd.equalsIgnoreCase("MY_NFT_REQUESTS")) {
                 String nft = console.readLine("Enter the id of the nft: ");
                 Set<Integer> keys = bftMap.keySet();
+                boolean found = false;
                 System.out.println("\nNFT requests in the map:");
 
                 for (int key : keys){
@@ -175,7 +176,12 @@ public class BFTMapInteractiveClient {
                         String coins = requestTokens[3];
                         String validity = requestTokens[4];
                         System.out.println("Key " + key + " -> NFT ID: " + nft + ", Coins: " + coins + ", Validity: " + validity);
+                        found = true;
                     }
+                }
+
+                if (!found) {
+                    System.out.println("NFT " + nft + " not found.");
                 }
 
             } else if (cmd.equalsIgnoreCase("PROCESS_NFT_TRANSFER")) {
