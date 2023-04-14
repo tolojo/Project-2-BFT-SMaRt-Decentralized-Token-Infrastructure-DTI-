@@ -106,7 +106,31 @@ public class BFTMapInteractiveClient {
                 System.out.println("\nkey-value pair added to the map\n");
                 local_key+=1;
 
-            } else if (cmd.equalsIgnoreCase("GET")) {
+            } 
+            else if (cmd.equalsIgnoreCase("REQUEST_NFT_TRANSFER")){
+                
+                String nftID = console.readLine("Enter the id of the nft: ");
+                Boolean _coins = true;
+                String coins ="";
+                while(_coins){
+                    String coin = console.readLine("Enter the ids of the coin you want to use: \n You can type 'DONE' to finish inputing coins");
+                    if (coin.equals("DONE")){
+                        _coins= false;
+                    }else{
+                        coins += coin + ",";
+                    }
+                }
+                String validity = console.readLine("Enter the validity of the transfer request");
+                
+                String request = clientId + "|" + nftID +"|" + coins+"|"+validity; 
+                //invokes the op on the servers
+                bftMap.put(local_key, request);
+
+                System.out.println("\nkey-value pair added to the map\n");
+                local_key+=1;
+
+            } 
+            else if (cmd.equalsIgnoreCase("GET")) {
 
                 int key;
                 try {
