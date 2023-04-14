@@ -73,7 +73,11 @@ public class BFTMap<K, V> implements Map<K, V> {
         	
         	if(token[0].equals("coin")) {
 	            request.setType(BFTMapRequestType.MINT);
-        	}else {
+        	}
+            else if(token[0].equals("nft_request")){
+                request.setType(BFTMapRequestType.REQUEST_NFT_TRANSFER);
+            }
+            else {
 	            request.setType(BFTMapRequestType.PUT);
         	}
         	request.setKey(key);

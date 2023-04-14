@@ -21,12 +21,14 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
     private final Logger logger = LoggerFactory.getLogger("bftsmart");
     private final ServiceReplica replica;
     private TreeMap<K, V> replicaMap;
+    private TreeMap<K,V> replicaRequestMap;
     private long coinID = 1L;
     private long nftID = 1L;
 
     //The constructor passes the id of the server to the super class
     public BFTMapServer(int id) {
         replicaMap = new TreeMap<>();
+        replicaRequestMap = new TreeMap<>();
         replica = new ServiceReplica(id, this, this);
     }
 
@@ -76,6 +78,35 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
 
                         return BFTMapMessage.toBytes(response);
                 	}
+                case REQUEST_NFT_TRANSFER:
+                    Boolean exists = false;
+                    String[] requestTransfer = request.getValue().toString().split("\\|");
+                    String userID = requestTransfer[1];
+                    V entry = replicaMap.get(Integer.parseInt(requestTransfer[2]));
+                    String nftUserId = entry.toString().split("\\|")[1];
+                    if (userID.equals(nftUserId)){
+                        response.setValue("You are the onwer of the nft");
+                        return BFTMapMessage.toBytes(response);
+                    }
+
+
+                    
+                    for (int i=0; i<replicaRequestMap.size();i++){
+                        String[] requestAux = replicaRequestMap.get(i).toString().split("\\|");
+                        String userAux = requestAux[1];
+                        if(userID.equals(userAux)) exists = true;
+                    }
+                    if (!exists){
+                        V oldV = replicaRequestMap.put(request.getKey(), request.getValue());
+                        System.out.println(replicaRequestMap.get(request.getKey()));
+                        if(oldV != null) {
+                            response.setValue(oldV);
+                        }else {
+                        	response.setValue(request.getKey());
+                        }
+
+                        return BFTMapMessage.toBytes(response);
+                    }
             }
 
             return null;
@@ -117,7 +148,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     if (nftOwner.equals(msgCtx.getSender())){
                         Map<K, V> purchaseOffers = new HashMap<>();
 
-                        for (Map.Entry<K,V> entry : replicaMap.entrySet()) {
+                        for (Map.Entry<K,V> entry : replicaRequestMap.entrySet()) {
                             K key = entry.getKey();
                             V value = entry.getValue();
 
