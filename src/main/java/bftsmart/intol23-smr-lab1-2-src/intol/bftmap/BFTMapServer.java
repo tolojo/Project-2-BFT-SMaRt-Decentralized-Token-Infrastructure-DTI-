@@ -10,6 +10,10 @@ import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -105,6 +109,38 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     response.setKeySet(keySet);
 
                     return BFTMapMessage.toBytes(response);
+                
+                case MY_NFT_REQUESTS:
+                    K nft = request.getKey();
+                    V nftOwner = replicaMap.get(nft);
+
+                    if (nftOwner.equals(msgCtx.getSender())){
+                        Map<K, V> purchaseOffers = new HashMap<>();
+
+                        for (Map.Entry<K,V> entry : replicaMap.entrySet()) {
+                            K key = entry.getKey();
+                            V value = entry.getValue();
+
+                            if (key instanceof String && ((String) key).startsWith("offer_") && value instanceof String){
+                                String[] offerTokens = ((String) value).split("\\|");
+
+                                if (offerTokens.length == 3 && offerTokens[0].equals(nft.toString())){
+                                    BFTMapMessage<K, V>  offer = new BFTMapMessage<>();
+                                    offer.setKey((K) offerTokens[1]);
+                                    offer.setValue((V) (offerTokens[2] + "|" + offerTokens[3]));
+                                    purchaseOffers.put(offer.getKey(), offer.getValue());
+
+                                }
+
+                            }
+                        }
+
+                        response.setValue(purchaseOffers);
+                        return BFTMapMessage.toBytes(response);
+                    } else {
+                        logger.info("Caller {} is not the owner of NFT {}", msgCtx.getSender(), nft);
+                        return null;
+                    }
             }
         } catch (IOException | ClassNotFoundException ex) {
             logger.error("Failed to process unordered request", ex);

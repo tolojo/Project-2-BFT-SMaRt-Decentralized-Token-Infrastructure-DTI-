@@ -25,10 +25,12 @@ public class BFTMapInteractiveClient {
         System.out.println("\tMY_COINS: List of all coins");
         System.out.println("\tMINT: Mint a Coin");
         System.out.println("\tSPEND: Transfer Coins");
+        System.out.println("\tMY_NFTS: List of all NFTS");
+        System.out.println("\tMY_NFT_REQUESTS: List of all requests for a NFT");
         System.out.println("\tMINT_NFT: Mint an NFT");
+        System.out.println("\tREQUEST_NFT_TRANSFER: Request for NFT transfer");
         System.out.println("\tSIZE: Retrieve the size of the map");
         System.out.println("\tREMOVE: Removes the value associated with the supplied key");
-        System.out.println("\tMY_NFTS: List of all NFTS");
         System.out.println("\tEXIT: Terminate this client\n");
 
         while (true) {
@@ -56,7 +58,7 @@ public class BFTMapInteractiveClient {
             	for (int key : keys) {
             		String coin = (String) bftMap.get(key);
                 	String[] coinTokens = coin.split("\\|");
-                	if(coinTokens[0].equals("coin")) {
+                	if(coinTokens[0].equals("coin") && coinTokens[1].equals(String.valueOf(clientId))) {
                 		String value = coinTokens[2];
                 		System.out.println("Key " + key + " -> value: " + value );
                 	}
@@ -122,7 +124,7 @@ public class BFTMapInteractiveClient {
                 }
                 String validity = console.readLine("Enter the validity of the transfer request");
                 
-                String request = clientId + "|" + nftID +"|" + coins+"|"+validity; 
+                String request = "nft_request" + "|" + clientId + "|" + nftID + "|" + coins + "|" + validity; 
                 //invokes the op on the servers
                 bftMap.put(local_key, request);
 
@@ -159,11 +161,22 @@ public class BFTMapInteractiveClient {
                 	}
                     
                 }
-                
-                
+                                
             } else if (cmd.equalsIgnoreCase("MY_NFT_REQUESTS")) {
+                String nft = console.readLine("Enter the id of the nft: ");
+                Set<Integer> keys = bftMap.keySet();
+                System.out.println("\nNFT requests in the map:");
 
-                System.out.println("\tYou are supposed to implement this command :)\n");
+                for (int key : keys){
+                    String request = (String) bftMap.get(key);
+                    String[] requestTokens = request.split("\\|");
+
+                    if (requestTokens[0].equals("nft_request") && requestTokens[1].equals(String.valueOf(clientId)) && requestTokens[2].equals(nft)){
+                        String coins = requestTokens[3];
+                        String validity = requestTokens[4];
+                        System.out.println("Key " + key + " -> NFT ID: " + nft + ", Coins: " + coins + ", Validity: " + validity);
+                    }
+                }
 
             } else if (cmd.equalsIgnoreCase("PROCESS_NFT_TRANSFER")) {
 
