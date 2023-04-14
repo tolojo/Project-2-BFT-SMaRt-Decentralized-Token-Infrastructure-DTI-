@@ -55,8 +55,23 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                 case SIZE:
                     
                 case REMOVE:
+                	
+                case MINT:
+                	String[] coinTokens = request.getValue().toString().split("\\|");
+                	String userId = coinTokens[1];
+                	String value = coinTokens[2];
+                	
+                	//only user with id=0 has permission to MINT coins and value contains only digits
+                	if(userId.equals("0") && value.matches("\\d+")) {
+                		V oldV = replicaMap.put(request.getKey(), request.getValue());
+                        if(oldV != null) {
+                            response.setValue(oldV);
+                        }else {
+                        	response.setValue(request.getKey());
+                        }
 
-                    
+                        return BFTMapMessage.toBytes(response);
+                	}
             }
 
             return null;

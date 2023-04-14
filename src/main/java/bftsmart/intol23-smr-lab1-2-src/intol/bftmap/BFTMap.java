@@ -68,9 +68,15 @@ public class BFTMap<K, V> implements Map<K, V> {
     public V put(K key, V value) {
         byte[] rep;
         try {
-            BFTMapMessage<K,V> request = new BFTMapMessage<>();
-            request.setType(BFTMapRequestType.PUT);
-            request.setKey(key);
+        	String[] token = value.toString().split("\\|");
+        	BFTMapMessage<K,V> request = new BFTMapMessage<>();
+        	
+        	if(token[0].equals("coin")) {
+	            request.setType(BFTMapRequestType.MINT);
+        	}else {
+	            request.setType(BFTMapRequestType.PUT);
+        	}
+        	request.setKey(key);
             request.setValue(value);
             //invokes BFT-SMaRt
             rep = serviceProxy.invokeOrdered(BFTMapMessage.toBytes(request));
@@ -81,7 +87,6 @@ public class BFTMap<K, V> implements Map<K, V> {
         if (rep.length == 0) {
             return null;
         }
-
         try {
             BFTMapMessage<K,V> response = BFTMapMessage.fromBytes(rep);
             return response.getValue();

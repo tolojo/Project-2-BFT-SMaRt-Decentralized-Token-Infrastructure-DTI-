@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry excluding="bftsmart/intol23-smr-lab1-2-src/" kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/java/bftsmart/intol23-smr-lab1-2-src"/>
+	<classpathentry kind="lib" path="build/install/library/lib/bcpkix-jdk15on-1.69.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/bcprov-jdk15on-1.69.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/bcutil-jdk15on-1.69.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/BenchmarkExecutor.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/BFT-SMaRt.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/commons-codec-1.15.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/core-0.1.4.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/logback-classic-1.2.5.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/logback-core-1.2.5.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/netty-all-4.1.67.Final.jar"/>
+	<classpathentry kind="lib" path="build/install/library/lib/slf4j-api-1.7.32.jar"/>
+	<classpathentry kind="lib" path="build/libs/BFT-SMaRt.jar"/>
+	<classpathentry kind="lib" path="gradle/wrapper/gradle-wrapper.jar"/>
+	<classpathentry kind="lib" path="lib/BenchmarkExecutor.jar"/>
+	<classpathentry kind="lib" path="lib/core-0.1.4.jar"/>
+	<classpathentry kind="output" path="bin/main"/>
+</classpath>
