@@ -203,14 +203,14 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         return BFTMapMessage.toBytes(response);
                     }
                     
-                    for (int i=0; i<replicaRequestMap.size();i++){
-                        String[] requestAux = replicaRequestMap.get(i).toString().split("\\|");
+                    for (int i=0; i<replicaMap.size();i++){
+                        String[] requestAux = replicaMap.get(i).toString().split("\\|");
                         String userAux = requestAux[1];
                         if(userID.equals(userAux)) exists = true;
                     }
                     if (!exists){
-                        V oldV = replicaRequestMap.put(request.getKey(), request.getValue());
-                        System.out.println(replicaRequestMap.get(request.getKey()));
+                        V oldV = replicaMap.put(request.getKey(), request.getValue());
+                        System.out.println(replicaMap.get(request.getKey()));
                         if(oldV != null) {
                             response.setValue(oldV);
                         }else {
@@ -260,13 +260,13 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     if (nftOwner.equals(msgCtx.getSender())){
                         Map<K, V> purchaseOffers = new HashMap<>();
 
-                        for (Map.Entry<K,V> entry : replicaRequestMap.entrySet()) {
+                        for (Map.Entry<K,V> entry : replicaMap.entrySet()) {
                             K key = entry.getKey();
                             V value = entry.getValue();
                             System.out.println(key);
                             System.out.println(value);
 
-                            if (key instanceof String && ((String) key).startsWith("offer_") && value instanceof String){
+                            if (key instanceof String && ((String) key).startsWith("nft_request") && value instanceof String){
                                 String[] offerTokens = ((String) value).split("\\|");
 
                                 if (offerTokens.length == 3 && offerTokens[0].equals(nft.toString())){
