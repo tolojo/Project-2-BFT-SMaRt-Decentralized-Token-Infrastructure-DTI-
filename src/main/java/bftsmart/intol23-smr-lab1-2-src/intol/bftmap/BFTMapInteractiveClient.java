@@ -191,7 +191,7 @@ public class BFTMapInteractiveClient {
                 for (int key : keys) {
             		String nft = (String) bftMap.get(key);
                 	String[] nftTokens = nft.split("\\|");
-                	if(nftTokens[0].equals("nft")) {
+                	if(nftTokens[0].equals("nft") && nftTokens[1].equals(clientId+"")) {
                 		String name = nftTokens[2];
                 		String uri = nftTokens[3];
                 		System.out.println("Key " + key + " -> name: " + name + " URI: " + uri );
