@@ -202,8 +202,6 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         response.setValue("You are the onwer of the nft");
                         return BFTMapMessage.toBytes(response);
                     }
-
-
                     
                     for (int i=0; i<replicaRequestMap.size();i++){
                         String[] requestAux = replicaRequestMap.get(i).toString().split("\\|");
@@ -223,7 +221,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     }
             }
 
-            return null;
+            return BFTMapMessage.toBytes(response);
         }catch (IOException | ClassNotFoundException ex) {
             logger.error("Failed to process ordered request", ex);
             return new byte[0];

@@ -27,6 +27,7 @@ public class BFTMapInteractiveClient {
         System.out.println("\tSPEND: Transfer Coins");
         System.out.println("\tMY_NFTS: List of all NFTS");
         System.out.println("\tMY_NFT_REQUESTS: List of all requests for a NFT");
+        System.out.println("\tCANCEL_REQUEST_NFT_TRANSFER: Cancel a transfer request of an NFT if you are the one that placed it");
         System.out.println("\tMINT_NFT: Mint an NFT");
         System.out.println("\tREQUEST_NFT_TRANSFER: Request for NFT transfer");
         System.out.println("\tSIZE: Retrieve the size of the map");
@@ -228,13 +229,7 @@ public class BFTMapInteractiveClient {
                 String nftID = console.readLine("Enter the id of the nft: ");
                 String cancelRequest = "cancel_request"+ "|" + clientId + "|" + nftID; 
                 //invokes the op on the servers
-                bftMap.put(0, cancelRequest);
-
-            } else if (cmd.equalsIgnoreCase("CANCEL_NFT_TRANSFER_REQUEST")) {
-
-            
-
-                System.out.println("\tYou are supposed to implement this command :)\n");
+                bftMap.remove(cancelRequest);
 
             } else if (cmd.equalsIgnoreCase("SIZE")) {
 
