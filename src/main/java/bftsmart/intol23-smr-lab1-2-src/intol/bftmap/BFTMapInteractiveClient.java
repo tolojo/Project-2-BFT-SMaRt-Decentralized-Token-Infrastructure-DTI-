@@ -209,7 +209,7 @@ public class BFTMapInteractiveClient {
                     String request = (String) bftMap.get(key);
                     String[] requestTokens = request.split("\\|");
 
-                    if (requestTokens[0].equals("nft_request") && requestTokens[1].equals(String.valueOf(clientId)) && requestTokens[2].equals(nft)){
+                    if (requestTokens[0].equals("nft_request") && requestTokens[2].equals(nft)){
                         String coins = requestTokens[3];
                         String validity = requestTokens[4];
                         System.out.println("Key " + key + " -> NFT ID: " + nft + ", Coins: " + coins + ", Validity: " + validity);

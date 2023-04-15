@@ -203,8 +203,8 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         return BFTMapMessage.toBytes(response);
                     }
                     
-                    for (int i=0; i<replicaMap.size();i++){
-                        String[] requestAux = replicaMap.get(i).toString().split("\\|");
+                    for (Map.Entry<K,V> _entry : replicaMap.entrySet()){
+                        String[] requestAux = _entry.getValue().toString().split("\\|");
                         String userAux = requestAux[1];
                         if(userID.equals(userAux)) exists = true;
                     }

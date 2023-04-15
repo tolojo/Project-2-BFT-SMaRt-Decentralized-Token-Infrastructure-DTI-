@@ -36,6 +36,8 @@ public class BFTMap<K, V> implements Map<K, V> {
     public V get(Object key) {
         byte[] rep;
         try {
+            String[] _key = key.toString().split("_");
+         
             BFTMapMessage<K,V> request = new BFTMapMessage<>();
             request.setType(BFTMapRequestType.GET);
             request.setKey(key);
