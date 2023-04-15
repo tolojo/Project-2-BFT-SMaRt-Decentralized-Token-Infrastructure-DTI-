@@ -110,7 +110,7 @@ public class BFTMapInteractiveClient {
                 	System.out.println("Invalid input: The value is supposed to be the ids of the coins (separated by a comma)!"); 
                 	continue;
                 }
-                String[] coins_list = coins.split(",");;
+                String[] coins_list = coins.split(",");
                 for (String coin : coins_list) {
             		// Check that each value is numeric
             		try {

@@ -133,6 +133,40 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
 
                         return BFTMapMessage.toBytes(response);
                 	}
+                case MINT_NFT:
+                    String[] nftTokens = request.getValue().toString().split("\\|");
+                    String user_ID = nftTokens[1];
+                    String nftName = nftTokens[2];
+                    if(user_ID.equals("0")) {
+                        boolean _nftExists = false;
+                        for(Map.Entry<K,V> nftEntry : replicaMap.entrySet()){
+                            V nftValue = nftEntry.getValue();
+                            String[] nft = ((String) nftValue).split("\\|");
+                            if(nft[0].equals("nft")){
+                                if(nftName.equals(nft[2])){
+                                    _nftExists = true;
+                                }
+                            }
+                        }
+                        if(!_nftExists){
+                            V oldV = replicaMap.put(request.getKey(), request.getValue());
+                            if(oldV != null) {
+                                response.setValue(oldV);
+                            }else {
+                                response.setValue(request.getKey());
+                            }
+    
+                            return BFTMapMessage.toBytes(response);
+                        }
+                        else {
+                            request.setValue("Already exists a NFT with that name");
+                            return BFTMapMessage.toBytes(request);
+                        }
+
+
+                    }
+
+                
                 case REQUEST_NFT_TRANSFER:
                     Boolean exists = false;
                     String[] requestTransfer = request.getValue().toString().split("\\|");
