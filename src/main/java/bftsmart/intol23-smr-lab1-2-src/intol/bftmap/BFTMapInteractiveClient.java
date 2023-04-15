@@ -6,14 +6,14 @@ package intol.bftmap;
 
 import java.io.Console;
 import java.io.IOException;
+import java.util.Random;
 import java.util.Set;
-
-import bftsmart.dti.nft;
 
 public class BFTMapInteractiveClient {
 
     public static void main(String[] args) throws IOException {
-        int local_key = 0;
+        Random random = new Random();
+        int local_key = random.nextInt(50000);
         int clientId = (args.length > 0) ? Integer.parseInt(args[0]) : 1001;
         BFTMap<Integer, Object> bftMap = new BFTMap<>(clientId);
 
@@ -82,7 +82,7 @@ public class BFTMapInteractiveClient {
                 String resp_value = bftMap.put(local_key, coin).toString();
 
                 System.out.println("\ncoin id: " + resp_value + " created");
-                local_key+=1;
+                local_key=random.nextInt(50000);;
 
             }else if (cmd.equalsIgnoreCase("SPEND")) {
             	int receiver;
@@ -128,7 +128,7 @@ public class BFTMapInteractiveClient {
                     System.out.println("Invalid operation");
                 }else {
                 	System.out.println("coin ID: " + resp + " created");
-                	local_key+=2;
+                	local_key=random.nextInt(50000);
                 }
             	
             }else if (cmd.equalsIgnoreCase("MINT_NFT")){
@@ -142,7 +142,7 @@ public class BFTMapInteractiveClient {
                 bftMap.put(local_key, nft);
 
                 System.out.println("\nkey-value pair added to the map\n");
-                local_key+=1;
+                local_key=random.nextInt(50000);
 
             } 
             else if (cmd.equalsIgnoreCase("REQUEST_NFT_TRANSFER")){
@@ -151,7 +151,7 @@ public class BFTMapInteractiveClient {
                 Boolean _coins = true;
                 String coins ="";
                 while(_coins){
-                    String coin = console.readLine("Enter the ids of the coin you want to use: \n You can type 'DONE' to finish inputing coins");
+                    String coin = console.readLine("Enter the ids of the coin you want to use: \n You can type 'DONE' to finish inputing coins ");
                     if (coin.equals("DONE")){
                         _coins= false;
                     }else{
@@ -165,7 +165,7 @@ public class BFTMapInteractiveClient {
                 bftMap.put(local_key, request);
 
                 System.out.println("\nkey-value pair added to the map\n");
-                local_key+=1;
+                local_key=random.nextInt(50000);
 
             } 
             else if (cmd.equalsIgnoreCase("GET")) {
@@ -224,7 +224,15 @@ public class BFTMapInteractiveClient {
 
                 System.out.println("\tYou are supposed to implement this command :)\n");
 
-            } else if (cmd.equalsIgnoreCase("REMOVE")) {
+            } else if (cmd.equalsIgnoreCase("CANCEL_REQUEST_NFT_TRANSFER")){
+                String nftID = console.readLine("Enter the id of the nft: ");
+                String cancelRequest = "cancel_request"+ "|" + clientId + "|" + nftID; 
+                //invokes the op on the servers
+                bftMap.put(0, cancelRequest);
+
+            } else if (cmd.equalsIgnoreCase("CANCEL_NFT_TRANSFER_REQUEST")) {
+
+            
 
                 System.out.println("\tYou are supposed to implement this command :)\n");
 

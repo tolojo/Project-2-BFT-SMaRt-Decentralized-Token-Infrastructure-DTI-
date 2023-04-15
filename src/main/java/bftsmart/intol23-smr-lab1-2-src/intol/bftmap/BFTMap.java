@@ -112,9 +112,21 @@ public class BFTMap<K, V> implements Map<K, V> {
     }
 
     @Override
-    public V remove(Object key) {
-        throw new UnsupportedOperationException("You are supposed to implement this method :)");
+    public V remove(Object nft_request_to_remove) {
+        byte[] rep;
+        try {
+        	BFTMapMessage<K,V> request = new BFTMapMessage<>();
+            request.setValue(nft_request_to_remove);
+            request.setType(BFTMapRequestType.CANCEL_REQUEST_NFT_TRANSFER);
+            rep = serviceProxy.invokeOrdered(BFTMapMessage.toBytes(request));
+            BFTMapMessage<K,V> response = BFTMapMessage.fromBytes(rep);
+            return response.getValue();
+        }
+    catch (ClassNotFoundException | IOException ex) {
+        logger.error("Failed to deserialized response of PUT request");
+        return null;
     }
+}
 
     @Override
     public Set<K> keySet() {
@@ -145,7 +157,22 @@ public class BFTMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean containsKey(Object key) {
-        throw new UnsupportedOperationException("You are supposed to implement this method :)");
+        byte[] rep;
+        try {
+            BFTMapMessage<K,V> request = new BFTMapMessage<>();
+            request.setType(BFTMapRequestType.GET);
+            request.setKey(key);
+
+            //invokes BFT-SMaRt
+            rep = serviceProxy.invokeUnordered(BFTMapMessage.toBytes(request));
+            if (rep == null) {
+                return true;
+            }
+            else return false;
+        } catch (IOException e) {
+            logger.error("Failed to send GET request");
+            return false;
+        }    
     }
 
     @Override

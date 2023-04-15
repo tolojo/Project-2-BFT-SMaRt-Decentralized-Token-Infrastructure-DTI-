@@ -137,7 +137,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     String[] nftTokens = request.getValue().toString().split("\\|");
                     String user_ID = nftTokens[1];
                     String nftName = nftTokens[2];
-                    if(user_ID.equals("0")) {
+                    
                         boolean _nftExists = false;
                         for(Map.Entry<K,V> nftEntry : replicaMap.entrySet()){
                             V nftValue = nftEntry.getValue();
@@ -164,8 +164,33 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         }
 
 
+                    
+                case CANCEL_REQUEST_NFT_TRANSFER:
+                Boolean userRequest = false;
+                Boolean nftRequest = false;
+                int requestID = 0;
+                String[] requestTransferCancel = request.getValue().toString().split("\\|");
+                    for(Map.Entry<K,V> nft : replicaMap.entrySet()){
+                        String nftID = nft.getKey().toString();
+                        if (requestTransferCancel[2].equals(nftID)){ 
+                            nftRequest= true;
+                        }
                     }
-
+                    for(Map.Entry<K,V> req : replicaRequestMap.entrySet()){
+                        String[] userID = req.getValue().toString().split("\\|");
+                        if (requestTransferCancel[1].equals(userID[1])){
+                            if(requestTransferCancel[2].equals(userID[2])){
+                            requestID = Integer.parseInt(req.getKey().toString());
+                            userRequest= true;
+                            }
+                        }
+                    }
+                    if(userRequest && nftRequest){
+                    V valueToRemove = replicaRequestMap.get(requestID);
+                    replicaRequestMap.remove(requestID);                
+                    return BFTMapMessage.toBytes(request);
+                    }
+                    else return BFTMapMessage.toBytes(request);
                 
                 case REQUEST_NFT_TRANSFER:
                     Boolean exists = false;
@@ -240,6 +265,8 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         for (Map.Entry<K,V> entry : replicaRequestMap.entrySet()) {
                             K key = entry.getKey();
                             V value = entry.getValue();
+                            System.out.println(key);
+                            System.out.println(value);
 
                             if (key instanceof String && ((String) key).startsWith("offer_") && value instanceof String){
                                 String[] offerTokens = ((String) value).split("\\|");
