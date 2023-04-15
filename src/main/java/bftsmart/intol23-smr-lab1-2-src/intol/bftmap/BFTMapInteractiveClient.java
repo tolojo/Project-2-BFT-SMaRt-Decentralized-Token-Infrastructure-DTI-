@@ -65,7 +65,17 @@ public class BFTMapInteractiveClient {
                	}
             	
             }else if (cmd.equalsIgnoreCase("MINT")) {
-            	String value = console.readLine("Enter the value of the coin: ");
+            	int value;
+                try {
+                	value = Integer.parseInt(console.readLine("Enter the value of the coin: "));
+                	if(value <= 0) {
+                		System.out.println("Invalid input: Please enter an integer value greater than 0!"); 
+                		continue;
+                	}
+                } catch (NumberFormatException e) {
+                	System.out.println("Invalid input: The value is supposed to be an integer!"); 
+                	continue;
+                }
                 String coin = "coin"+ "|" + clientId + "|" + value; 
 
                 //invokes the op on the servers
@@ -75,25 +85,51 @@ public class BFTMapInteractiveClient {
                 local_key+=1;
 
             }else if (cmd.equalsIgnoreCase("SPEND")) {
-            	int sum_coins = 0;
-            	String[] coins = console.readLine("Enter the ids of the coins (separated by a comma): ").split(",");
-            	int receiver = Integer.parseInt(console.readLine("Enter the receiver's ID: "));
-            	int value = Integer.parseInt(console.readLine("Enter the value to be transfered: "));
-            	System.out.println(coins[0] + coins[1]);
-            	for (String coin : coins) {
-                	String coin_value = (String) bftMap.get(Integer.parseInt(coin));
-                	sum_coins += Integer.parseInt(coin_value.split("\\|")[2]);
+            	int receiver;
+                try {
+                	receiver = Integer.parseInt(console.readLine("Enter the receiver's ID: "));
+                } catch (NumberFormatException e) {
+                	System.out.println("Invalid input: The ID is supposed to be an integer!"); 
+                	continue;
+                }
+                int value;
+                try {
+                	value = Integer.parseInt(console.readLine("Enter the value to be transfered: "));
+                	if(value <= 0) {
+                		System.out.println("Invalid input: Please enter an integer value greater than 0!"); 
+                		continue;
+                	}
+                } catch (NumberFormatException e) {
+                	System.out.println("Invalid input: The value is supposed to be an integer!"); 
+                	continue;
+                }
+                String coins;
+                try {
+                	coins = console.readLine("Enter the ids of the coins (separated by a comma): ");
+                } catch (NumberFormatException e) {
+                	System.out.println("Invalid input: The value is supposed to be the ids of the coins (separated by a comma)!"); 
+                	continue;
+                }
+                String[] coins_list = coins.split(",");;
+                for (String coin : coins_list) {
+            		// Check that each value is numeric
+            		try {
+                        Integer.parseInt(coin);
+                    } catch (NumberFormatException e) {
+                    	System.out.println("Invalid input: The ID is supposed to be an integer!");
+                    	continue;
+                    }             	
             	}
-            	if(sum_coins >= value) {
-            		String coin = "coin"+ "|" + receiver + "|" + value; 
-            		String resp_value = bftMap.put(local_key, coin).toString();
-                    System.out.println("\ncoin id: " + resp_value + " created in user: " + receiver);
-                    local_key+=1;
-                    
-                    //new_coin = sum_coins - value;
-            	}else {
-                	System.out.println("Not enough coins");
-            	}
+                String spend = "spend" + "|" + clientId + "|" + coins + "|" + receiver + "|" + value; 
+                //invokes the op on the servers
+                String resp = bftMap.put(local_key, spend).toString();
+                
+                if(resp.equals("0")) {
+                    System.out.println("Invalid operation");
+                }else {
+                	System.out.println("coin ID: " + resp + " created");
+                	local_key+=2;
+                }
             	
             }else if (cmd.equalsIgnoreCase("MINT_NFT")){
                 

@@ -22,6 +22,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
     private final ServiceReplica replica;
     private TreeMap<K, V> replicaMap;
     private TreeMap<K,V> replicaRequestMap;
+    //private TreeMap<K,V> replicaSpendMap;
     private long coinID = 1L;
     private long nftID = 1L;
 
@@ -61,6 +62,60 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                 case SIZE:
                     
                 case REMOVE:
+                	
+                case SPEND:
+                	int sum_coins = 0;
+                	int remaining_value = 0;
+                	String[] spend = request.getValue().toString().split("\\|");
+//                    String spend = "spend" + "|" + clientId + "|" + coins + "|" + receiver + "|" + value; 
+                	for (String coin : spend[2].split(",")) {
+                		try {
+                			String[] ret = replicaMap.get(Integer.parseInt(coin)).toString().split("\\|");
+                    		// Check if the coin belongs to this client
+                            if (Integer.parseInt(spend[1]) != Integer.parseInt(ret[1])) {
+                            	response.setValue(0); 
+                            	return BFTMapMessage.toBytes(response);
+                            }else {
+                            	sum_coins += Integer.parseInt(ret[2]);
+                            }
+                		}
+                		// Check if the coin exists
+                		catch(NumberFormatException | NullPointerException e) {
+                			response.setValue(0); 
+                        	return BFTMapMessage.toBytes(response);
+                		}
+                	}
+                	if(sum_coins >= Integer.parseInt(spend[4])) {
+                		//TODO map?
+                		//V oldV = replicaSpendMap.put(request.getKey(), request.getValue());
+                        //System.out.println(replicaRequestMap.get(request.getKey()));
+
+                		//create new coin for the receiver 
+                		V receiver_coin = (V) ("coin"+ "|" + spend[3] + "|" + spend[4]);
+                		replicaMap.put(request.getKey(), receiver_coin);
+
+                        //remove all sender coins used in the transaction
+                		for (String used_coin : spend[2].split(",")) {
+                			V removedValue = replicaMap.remove(Integer.parseInt(used_coin));
+                        }
+
+                        //create new coin for the sender with the remaining value
+                		remaining_value = sum_coins - Integer.parseInt(spend[4]);
+                		V sender_coin = (V) ("coin"+ "|" + spend[1] + "|" + remaining_value); 
+                		K key = (K) Integer.valueOf(Integer.valueOf(request.getKey().toString())+1);
+                		V oldVal = replicaMap.put(key, sender_coin);
+
+                		if(oldVal != null) {
+                            response.setValue(oldVal);
+                        }else {
+                        	response.setValue(key);
+                        }
+                        return BFTMapMessage.toBytes(response);
+                		
+                	}
+                	
+                    response.setValue(request.getValue()); //TODO change this to new coin
+                    return BFTMapMessage.toBytes(response);
                 	
                 case MINT:
                 	String[] coinTokens = request.getValue().toString().split("\\|");
