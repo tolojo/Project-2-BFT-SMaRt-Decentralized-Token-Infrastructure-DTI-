@@ -7,6 +7,8 @@ package intol.bftmap;
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+
+import org.bouncycastle.asn1.ocsp.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
@@ -212,7 +214,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         String userAux = requestAux[1];
                         if(userID.equals(userAux)) exists = true;
                     }
-                    if (!exists && isDateValid){
+                    if (!exists && isDateValid && areCoinsFromUser){
                         V oldV = replicaMap.put(request.getKey(), request.getValue());
                         System.out.println(replicaMap.get(request.getKey()));
                         if(oldV != null) {
@@ -220,9 +222,10 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         }else {
                         	response.setValue(request.getKey());
                         }
-
+                        System.out.println("erro a colocar proposta na lista");
                         return BFTMapMessage.toBytes(response);
                     }
+                    return BFTMapMessage.toBytes(request);
                 
                 case PROCESS_NFT_TRANSFER:
                     K nftKey = request.getKey();
