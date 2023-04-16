@@ -403,6 +403,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
     }
 
     boolean isCoinFromUser(String coinID, int userID){
+        if(coinID.equals("") || coinID.equals(" ")) return true;
         String[] coin = replicaMap.get(Integer.parseInt(coinID)).toString().split("\\|");
         if(Integer.parseInt(coin[1]) == userID) return true;
     return false;
