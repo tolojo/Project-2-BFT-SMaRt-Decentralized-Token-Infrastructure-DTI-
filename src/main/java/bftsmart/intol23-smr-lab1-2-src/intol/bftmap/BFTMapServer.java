@@ -12,7 +12,9 @@ import org.bouncycastle.asn1.ocsp.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
+import java.util.Date;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -237,34 +239,41 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     return BFTMapMessage.toBytes(request);
                 
                 case PROCESS_NFT_TRANSFER:
-                    K nftKey = request.getKey();
-                    V nftOwner = replicaMap.get(nftKey);
-    
-                    if (!nftOwner.equals(msgCtx.getSender())) {
-                        logger.info("Caller {} is not the owner of NFT {}", msgCtx.getSender(), nftKey);
-                        return null;
+                    //String transfer = "nft_process" + "|" + nftID + "|" + buyerID + "|" + acceptStr;
+                    Set<Integer> keys = bftMap.keySet();
+                    String[] requestProcess = request.getValue().toString().split("\\|");
+                    boolean isNFTowner = false;   
+                    boolean buyerHasOffer = false;
+                    String nftId = requestProcess[1];
+                    String buyerId = requestProcess[2];
+                    boolean accept = Boolean.parseBoolean(requestProcess[3]);
+                    //String nft = "nft"+ "|" + clientId + "|" + name +"|" + uri; 
+                    String[] nft = replicaMap.get(Integer.parseInt(nftId)).toString().split("\\|");
+                    boolean isValid = false;
+                    if (msgCtx.equals(nft[1])) isNFTowner = true;
+                
+
+                    //String request = "nft_request" + "|" + clientId + "|" + nftID + "|" + coins + "|" + validity + "|" + valor; 
+                    for (Integer key : keys){
+                        String[] offer = replicaMap.get(key).toString().split("\\|");
+
+                        if(offer[0].equals("nft_request") && offer[1].equals(requestProcess[2]) && offer[2].equals(nftId)){ 
+                            buyerHasOffer = true;
+                            SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
+                            Date d1 = sdformat.parse(offer[4]);
+                            Date d2 = new Date(); 
+                            if(d1.compareTo(d2)>0) isValid = true; 
+                        }
                     }
-    
-                    String[] transferTokens = ((String) request.getValue()).split("\\|");
-                    String nftId = transferTokens[0];
-                    String buyerId = transferTokens[1];
-                    boolean accept = Boolean.parseBoolean(transferTokens[2]);
-    
-                    String offerKey = "nft_process" + "|" + buyerId + "|" + nftId;
-                    String offerValue = (String) replicaMap.get(offerKey);
-    
-                    if (offerValue == null) {
-                        logger.info("No offer found for NFT transfer from buyer {} for NFT {}", buyerId, nftId);
-                        return null;
+
+                    if(isNFTowner && buyerHasOffer && isValid && requestProcess[3].equals("true")){
+                    //-------->
+
                     }
     
                     String[] offerTokens = offerValue.split("\\|");
                     int coins = Integer.parseInt(offerTokens[3]);
     
-                    if (!accept) {
-                        logger.info("NFT transfer from buyer {} for NFT {} has been rejected by owner", buyerId, nftId);
-                        return null;
-                    }
     
                     int sumCoins = 0;
                     String[] coinIds = offerTokens[2].split(",");
@@ -303,6 +312,12 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     String sellerCoinValue = "coin" + "|" + nftOwner + "|" + remainingValue;
                     K sellerCoinKey = (K) Integer.valueOf(Integer.valueOf(nftKey.toString())+1);
                     V oldVal = replicaMap.put(sellerCoinKey, (V) sellerCoinValue);
+
+                    remaining_value = sum_coins - Integer.parseInt(spend[4]);
+                	V sender_coin = (V) ("coin"+ "|" + spend[1] + "|" + remaining_value); 
+                	K key = (K) Integer.valueOf(Integer.valueOf(request.getKey().toString())+1);
+                	V oldVal = replicaMap.put(key, sender_coin);
+
 
                     if (oldVal != null) {
                         response.setValue(oldVal);

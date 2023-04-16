@@ -225,33 +225,21 @@ public class BFTMapInteractiveClient {
                 }
 
             } else if (cmd.equalsIgnoreCase("PROCESS_NFT_TRANSFER")) {
-                int nft;
+                int nftID = 0;
                 try {
-                	nft = Integer.parseInt(console.readLine("Enter the nft ID: "));
+                	nftID = Integer.parseInt(console.readLine("Enter the nft ID: "));
                 } catch (NumberFormatException e) {
                 	System.out.println("Invalid input: The ID is supposed to be an integer!"); 
-                	continue;
                 }
-                int buyer;
+                int buyerID = 0;
                 try {
-                	buyer = Integer.parseInt(console.readLine("Enter the buyer ID: "));
+                	buyerID = Integer.parseInt(console.readLine("Enter the buyer ID: "));
                 } catch (NumberFormatException e) {
                 	System.out.println("Invalid input: The value is supposed to be an integer!"); 
-                	continue;
                 }
-                String acceptStr;
-                try {
-                	acceptStr = console.readLine("Accept or reject the transfer? (true/false): ");
-                    if (!acceptStr.equals("true") || !acceptStr.equals("false")){
-                        System.out.println("Invalid input: The value is supposed to be true or false!");
-                        continue;
-                    }
-                } catch (NumberFormatException e) {
-                	System.out.println("Invalid input: The value is supposed to be true or false!"); 
-                	continue;
-                }
-
-                String transfer = "nft_process" + "|" + clientId + "|" + nft + "|" + buyer + "|" + acceptStr;
+                String acceptStr = console.readLine("Accept or reject the transfer? (true/false): ");
+            
+                String transfer = "nft_process" + "|" + nftID + "|" + buyerID + "|" + acceptStr;
 
                 String resp = bftMap.put(local_key, transfer).toString();
 
