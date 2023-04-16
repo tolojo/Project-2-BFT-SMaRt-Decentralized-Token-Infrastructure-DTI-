@@ -67,7 +67,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                 	int sum_coins = 0;
                 	int remaining_value = 0;
                 	String[] spend = request.getValue().toString().split("\\|");
-//                    String spend = "spend" + "|" + clientId + "|" + coins + "|" + receiver + "|" + value; 
+
                 	for (String coin : spend[2].split(",")) {
                 		try {
                 			String[] ret = replicaMap.get(Integer.parseInt(coin)).toString().split("\\|");
@@ -86,9 +86,6 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                 		}
                 	}
                 	if(sum_coins >= Integer.parseInt(spend[4])) {
-                		//TODO map?
-                		//V oldV = replicaSpendMap.put(request.getKey(), request.getValue());
-                        //System.out.println(replicaRequestMap.get(request.getKey()));
 
                 		//create new coin for the receiver 
                 		V receiver_coin = (V) ("coin"+ "|" + spend[3] + "|" + spend[4]);
@@ -162,14 +159,12 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                             request.setValue("Already exists a NFT with that name");
                             return BFTMapMessage.toBytes(request);
                         }
-
-
                     
                 case CANCEL_REQUEST_NFT_TRANSFER:
-                Boolean userRequest = false;
-                Boolean nftRequest = false;
-                int requestID = 0;
-                String[] requestTransferCancel = request.getValue().toString().split("\\|");
+                    Boolean userRequest = false;
+                    Boolean nftRequest = false;
+                    int requestID = 0;
+                    String[] requestTransferCancel = request.getValue().toString().split("\\|");
                     for(Map.Entry<K,V> nft : replicaMap.entrySet()){
                         String nftID = nft.getKey().toString();
                         if (requestTransferCancel[2].equals(nftID)){ 
@@ -219,8 +214,85 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
 
                         return BFTMapMessage.toBytes(response);
                     }
-            }
+                
+                case PROCESS_NFT_TRANSFER:
+                    K nftKey = request.getKey();
+                    V nftOwner = replicaMap.get(nftKey);
+    
+                    if (!nftOwner.equals(msgCtx.getSender())) {
+                        logger.info("Caller {} is not the owner of NFT {}", msgCtx.getSender(), nftKey);
+                        return null;
+                    }
+    
+                    String[] transferTokens = ((String) request.getValue()).split("\\|");
+                    String nftId = transferTokens[0];
+                    String buyerId = transferTokens[1];
+                    boolean accept = Boolean.parseBoolean(transferTokens[2]);
+    
+                    String offerKey = "nft_process" + "|" + buyerId + "|" + nftId;
+                    String offerValue = (String) replicaMap.get(offerKey);
+    
+                    if (offerValue == null) {
+                        logger.info("No offer found for NFT transfer from buyer {} for NFT {}", buyerId, nftId);
+                        return null;
+                    }
+    
+                    String[] offerTokens = offerValue.split("\\|");
+                    int coins = Integer.parseInt(offerTokens[3]);
+    
+                    if (!accept) {
+                        logger.info("NFT transfer from buyer {} for NFT {} has been rejected by owner", buyerId, nftId);
+                        return null;
+                    }
+    
+                    int sumCoins = 0;
+                    String[] coinIds = offerTokens[2].split(",");
+                    
+                    for (String coinId : coinIds) {
+                        String coinKey = "coin" + "|" + buyerId + "|" + coinId;
+                        String coinValue = (String) replicaMap.get(coinKey);
+                        
+                        if (coinValue == null) {
+                            logger.info("Coin {} not found for NFT transfer from buyer {} for NFT {}", coinId, buyerId, nftId);
+                            return null;
+                        }
+                        
+                        String[] coinT = coinValue.split("\\|");
+                        int coinValueInt = Integer.parseInt(coinT[2]);
+                        sumCoins += coinValueInt;
+                    }
+    
+                    if (sumCoins < coins) {
+                        logger.info("Insufficient coins for NFT transfer from buyer {} for NFT {}", buyerId, nftId);
+                        return null;
+                    }
+    
+                    // transfer NFT ownership
+                    V nftValue = (V) buyerId;
+                    replicaMap.put(nftKey, nftValue);
+    
+                    // remove buyer's coins used in the transaction
+                    for (String coinId : coinIds) {
+                        String coinKey = "coin" + "|" + buyerId + "|" + coinId;
+                        replicaMap.remove(coinKey);
+                    }
+    
+                    // create new coin for the seller with the payment
+                    int remainingValue = sumCoins - coins;
+                    String sellerCoinValue = "coin" + "|" + nftOwner + "|" + remainingValue;
+                    K sellerCoinKey = (K) Integer.valueOf(Integer.valueOf(nftKey.toString())+1);
+                    V oldVal = replicaMap.put(sellerCoinKey, (V) sellerCoinValue);
 
+                    if (oldVal != null) {
+                        response.setValue(oldVal);
+                    } else {
+                        response.setValue(sellerCoinKey);
+                    }
+                    
+                    return BFTMapMessage.toBytes(response);
+                    
+            }
+            
             return BFTMapMessage.toBytes(response);
         }catch (IOException | ClassNotFoundException ex) {
             logger.error("Failed to process ordered request", ex);

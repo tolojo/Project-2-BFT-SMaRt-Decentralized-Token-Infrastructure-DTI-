@@ -6,6 +6,7 @@ package intol.bftmap;
 
 import java.io.Console;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -222,8 +223,9 @@ public class BFTMapInteractiveClient {
                 }
 
             } else if (cmd.equalsIgnoreCase("PROCESS_NFT_TRANSFER")) {
-
-                System.out.println("\tYou are supposed to implement this command :)\n");
+                String nft = console.readLine("Enter the id of the nft: ");
+                String buyer = console.readLine("Enter the id of the buyer: ");
+                String acceptStr = console.readLine("Accept or reject the transfer? (true/false): ");
 
             } else if (cmd.equalsIgnoreCase("CANCEL_REQUEST_NFT_TRANSFER")){
                 String nftID = console.readLine("Enter the id of the nft: ");
