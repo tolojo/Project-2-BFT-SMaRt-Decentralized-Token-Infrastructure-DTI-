@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.plaf.TreeUI;
+
 public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
     private final Logger logger = LoggerFactory.getLogger("bftsmart");
     private final ServiceReplica replica;
@@ -191,7 +193,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     else return BFTMapMessage.toBytes(request);
                 
                 case REQUEST_NFT_TRANSFER:
-                    Boolean exists = false;
+                    Boolean exists = true;
                     String[] requestTransfer = request.getValue().toString().split("\\|");
                     String userID = requestTransfer[1];
                     V entry = replicaMap.get(Integer.parseInt(requestTransfer[2]));
@@ -212,9 +214,13 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     for (Map.Entry<K,V> _entry : replicaMap.entrySet()){
                         String[] requestAux = _entry.getValue().toString().split("\\|");
                         String userAux = requestAux[1];
-                        if(userID.equals(userAux)) exists = true;
+                        if(requestAux[0].equals("nft_request")){
+                        if(userID.equals(userAux)) exists = false;}
                     }
-                    if (!exists && isDateValid && areCoinsFromUser){
+                    System.out.println(exists);
+                    System.out.println(isDateValid);
+                    System.out.println(areCoinsFromUser);
+                    if (exists && isDateValid && areCoinsFromUser){
                         V oldV = replicaMap.put(request.getKey(), request.getValue());
                         System.out.println(replicaMap.get(request.getKey()));
                         if(oldV != null) {
@@ -222,9 +228,10 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         }else {
                         	response.setValue(request.getKey());
                         }
-                        System.out.println("erro a colocar proposta na lista");
+                        
                         return BFTMapMessage.toBytes(response);
                     }
+                    System.out.println("erro a colocar proposta na lista");
                     return BFTMapMessage.toBytes(request);
                 
                 case PROCESS_NFT_TRANSFER:
