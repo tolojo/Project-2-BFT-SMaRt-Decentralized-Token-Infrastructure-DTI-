@@ -10,6 +10,7 @@ import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -171,7 +172,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                             nftRequest= true;
                         }
                     }
-                    for(Map.Entry<K,V> req : replicaRequestMap.entrySet()){
+                    for(Map.Entry<K,V> req : replicaMap.entrySet()){
                         String[] userID = req.getValue().toString().split("\\|");
                         if (requestTransferCancel[1].equals(userID[1])){
                             if(requestTransferCancel[2].equals(userID[2])){
@@ -181,8 +182,8 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         }
                     }
                     if(userRequest && nftRequest){
-                    V valueToRemove = replicaRequestMap.get(requestID);
-                    replicaRequestMap.remove(requestID);                
+                    V valueToRemove = replicaMap.get(requestID);
+                    replicaMap.remove(requestID);                
                     return BFTMapMessage.toBytes(request);
                     }
                     else return BFTMapMessage.toBytes(request);
@@ -197,13 +198,16 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         response.setValue("You are the onwer of the nft");
                         return BFTMapMessage.toBytes(response);
                     }
+                    DateValidatorUsingDateFormat validator = new DateValidatorUsingDateFormat("MM/dd/yyyy");
+
+                    boolean isDateValid = validator.isValid(requestTransfer[4]);
                     
                     for (Map.Entry<K,V> _entry : replicaMap.entrySet()){
                         String[] requestAux = _entry.getValue().toString().split("\\|");
                         String userAux = requestAux[1];
                         if(userID.equals(userAux)) exists = true;
                     }
-                    if (!exists){
+                    if (!exists && isDateValid){
                         V oldV = replicaMap.put(request.getKey(), request.getValue());
                         System.out.println(replicaMap.get(request.getKey()));
                         if(oldV != null) {
