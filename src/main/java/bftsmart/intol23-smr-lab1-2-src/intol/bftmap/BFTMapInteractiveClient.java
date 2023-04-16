@@ -223,9 +223,42 @@ public class BFTMapInteractiveClient {
                 }
 
             } else if (cmd.equalsIgnoreCase("PROCESS_NFT_TRANSFER")) {
-                String nft = console.readLine("Enter the id of the nft: ");
-                String buyer = console.readLine("Enter the id of the buyer: ");
-                String acceptStr = console.readLine("Accept or reject the transfer? (true/false): ");
+                int nft;
+                try {
+                	nft = Integer.parseInt(console.readLine("Enter the nft ID: "));
+                } catch (NumberFormatException e) {
+                	System.out.println("Invalid input: The ID is supposed to be an integer!"); 
+                	continue;
+                }
+                int buyer;
+                try {
+                	buyer = Integer.parseInt(console.readLine("Enter the buyer ID: "));
+                } catch (NumberFormatException e) {
+                	System.out.println("Invalid input: The value is supposed to be an integer!"); 
+                	continue;
+                }
+                String acceptStr;
+                try {
+                	acceptStr = console.readLine("Accept or reject the transfer? (true/false): ");
+                    if (!acceptStr.equals("true") || !acceptStr.equals("false")){
+                        System.out.println("Invalid input: The value is supposed to be true or false!");
+                        continue;
+                    }
+                } catch (NumberFormatException e) {
+                	System.out.println("Invalid input: The value is supposed to be true or false!"); 
+                	continue;
+                }
+
+                String transfer = "nft_process" + "|" + clientId + "|" + nft + "|" + buyer + "|" + acceptStr;
+
+                String resp = bftMap.put(local_key, transfer).toString();
+
+                if (resp.equals("0")) {
+                    System.out.println("Invalid operation");
+                } else {
+                    System.out.println("Transfer successful");
+                    local_key = random.nextInt(50000);
+                }
 
             } else if (cmd.equalsIgnoreCase("CANCEL_REQUEST_NFT_TRANSFER")){
                 String nftID = console.readLine("Enter the id of the nft: ");
