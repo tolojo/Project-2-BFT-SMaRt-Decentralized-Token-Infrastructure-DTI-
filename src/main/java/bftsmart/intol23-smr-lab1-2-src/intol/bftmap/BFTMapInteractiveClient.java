@@ -160,7 +160,7 @@ public class BFTMapInteractiveClient {
                         coins += coin + ",";
                     }
                 }
-                String validity = console.readLine("Enter the validity of the transfer request");
+                String validity = console.readLine("Enter the validity of the transfer request with the following format: MM/dd/yyyy ");
                 
                 String request = "nft_request" + "|" + clientId + "|" + nftID + "|" + coins + "|" + validity; 
                 //invokes the op on the servers

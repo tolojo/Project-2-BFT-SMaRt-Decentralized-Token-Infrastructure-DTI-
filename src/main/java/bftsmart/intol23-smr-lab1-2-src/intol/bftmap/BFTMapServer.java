@@ -199,9 +199,14 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                         return BFTMapMessage.toBytes(response);
                     }
                     DateValidatorUsingDateFormat validator = new DateValidatorUsingDateFormat("MM/dd/yyyy");
-
                     boolean isDateValid = validator.isValid(requestTransfer[4]);
-                    
+                    //ver monedas 
+                    String[] requestCoins = requestTransfer[3].split(",");
+                    boolean areCoinsFromUser= false;
+                    for(int i = 0; i<requestCoins.length;i++){
+                        areCoinsFromUser = isCoinFromUser(requestCoins[i], msgCtx.getSender());
+                    }
+
                     for (Map.Entry<K,V> _entry : replicaMap.entrySet()){
                         String[] requestAux = _entry.getValue().toString().split("\\|");
                         String userAux = requestAux[1];
@@ -394,4 +399,9 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
         }
     }
 
+    boolean isCoinFromUser(String coinID, int userID){
+        String[] coin = replicaMap.get(Integer.parseInt(coinID)).toString().split("\\|");
+        if(Integer.parseInt(coin[1]) == userID) return true;
+    return false;
+    }
 }
