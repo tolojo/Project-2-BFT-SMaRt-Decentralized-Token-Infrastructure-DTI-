@@ -254,7 +254,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     String offerValue = "";
                     String[] coins = new String[100];
 
-                    if (msgCtx.equals(nft[1])) isNFTowner = true;
+                    if (msgCtx.getSender() == Integer.parseInt(nft[1])) isNFTowner = true;
                 
 
                     //String request = "nft_request" + "|" + clientId + "|" + nftID + "|" + coins + "|" + validity + "|" + value; 
@@ -277,8 +277,12 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                             
                         }
                     }
-
+                    System.out.println(isNFTowner);
+                    System.out.println(buyerHasOffer);
+                    System.out.println(isValid);
+                    System.out.println(requestProcess[3].equals("true"));
                     if(isNFTowner && buyerHasOffer && isValid && requestProcess[3].equals("true")){
+                        System.out.println("entrei aqui");
                         int sumCoins = 0;
                         for (int i = 0; i < coins.length; i ++){ // falta verificar a existencia delas
                             sumCoins += Integer.parseInt(replicaMap.get(Integer.parseInt(coins[i])).toString().split("\\|")[2]);
@@ -291,16 +295,20 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
 
 
                             //create new coin for the receiver 
-                		    V receiver_coin = (V) ("coin"+ "|" + requestProcess[2] + "|" + offerValue);
+                		    V receiver_coin = (V) ("coin"+ "|" + msgCtx.getSender() + "|" + offerValue);
                 		    replicaMap.put(request.getKey(), receiver_coin);
 
 
                             for (String usedCoins : coins) {
-                                replicaMap.remove(Integer.parseInt(usedCoins));
+                                System.out.println(usedCoins);
+                                replicaMap.remove(Integer.valueOf(Integer.parseInt(usedCoins)));
                             }
-
+                            replicaMap.remove(Integer.valueOf(Integer.parseInt(nftId)));
                             V newVal = (V) ("nft"+ "|" + requestProcess[2] + "|" + nft[2] + "|" + nft[3]); 
-                            V oldV = replicaMap.put((K) nftId , newVal);
+                            K nftKey =(K) Integer.valueOf(Integer.parseInt(nftId));
+
+                            System.out.println(nftId);
+                            V oldV = replicaMap.put(nftKey , newVal);
 
                             if(oldV != null) {
                                 response.setValue(oldV);
@@ -312,15 +320,15 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
 
 
                         } else if(nftRequestValue < sumCoins){
-                            int rest = nftRequestValue - sumCoins;
+                            int rest = sumCoins-nftRequestValue;
 
                             //create new coin for the receiver 
-                		    V receiver_coin = (V) ("coin"+ "|" + requestProcess[2] + "|" + offerValue);
+                		    V receiver_coin = (V) ("coin"+ "|" + msgCtx.getSender() + "|" + offerValue);
                 		    replicaMap.put(request.getKey(), receiver_coin);
 
                             //remove all sender coins used in the transaction
                 		    for (String usedCoins : coins) {
-                			    replicaMap.remove(Integer.parseInt(usedCoins));
+                			    replicaMap.remove(Integer.valueOf(Integer.parseInt(usedCoins)));
                             }
 
                             //create new coin for the sender with the remaining value
@@ -329,7 +337,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                 		    V oldVal = replicaMap.put(key, sender_coin);
 
                             V newVal = (V) ("nft"+ "|" + requestProcess[2] + "|" + nft[2] + "|" + nft[3]); 
-                            replicaMap.put((K) nftId , newVal);
+                            replicaMap.put((K) Integer.valueOf(Integer.parseInt(nftId)) , newVal);
 
                             if(oldVal != null) {
                                 response.setValue(oldVal);

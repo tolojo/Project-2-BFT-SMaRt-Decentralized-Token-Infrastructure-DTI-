@@ -21,8 +21,6 @@ public class BFTMapInteractiveClient {
         Console console = System.console();
 
         System.out.println("\nCommands:\n");
-        System.out.println("\tPUT: Insert value into the map");
-        System.out.println("\tGET: Retrieve value from the map");
         System.out.println("\tMY_COINS: List of all coins");
         System.out.println("\tMINT: Mint a Coin");
         System.out.println("\tSPEND: Transfer Coins");
@@ -31,8 +29,7 @@ public class BFTMapInteractiveClient {
         System.out.println("\tCANCEL_REQUEST_NFT_TRANSFER: Cancel a transfer request of an NFT if you are the one that placed it");
         System.out.println("\tMINT_NFT: Mint an NFT");
         System.out.println("\tREQUEST_NFT_TRANSFER: Request for NFT transfer");
-        System.out.println("\tSIZE: Retrieve the size of the map");
-        System.out.println("\tREMOVE: Removes the value associated with the supplied key");
+        System.out.println("\tPROCESS_NFT_TRANSFER: Process for NFT transfer request");
         System.out.println("\tEXIT: Terminate this client\n");
 
         while (true) {
@@ -256,11 +253,9 @@ public class BFTMapInteractiveClient {
                 //invokes the op on the servers
                 bftMap.remove(cancelRequest);
 
-            } else if (cmd.equalsIgnoreCase("SIZE")) {
+            } 
 
-                System.out.println("\tYou are supposed to implement this command :)\n");
-
-            } else if (cmd.equalsIgnoreCase("EXIT")) {
+            else if (cmd.equalsIgnoreCase("EXIT")) {
 
                 System.out.println("\tEXIT: Bye bye!\n");
                 System.exit(0);
