@@ -161,8 +161,9 @@ public class BFTMapInteractiveClient {
                     }
                 }
                 String validity = console.readLine("Enter the validity of the transfer request with the following format: MM/dd/yyyy ");
-                
-                String request = "nft_request" + "|" + clientId + "|" + nftID + "|" + coins + "|" + validity; 
+                String value = console.readLine("Enter the value of the transfer request: ");
+
+                String request = "nft_request" + "|" + clientId + "|" + nftID + "|" + coins + "|" + validity + "|" + value; 
                 //invokes the op on the servers
                 bftMap.put(local_key, request);
 
@@ -213,7 +214,8 @@ public class BFTMapInteractiveClient {
                     if (requestTokens[0].equals("nft_request") && requestTokens[2].equals(nft)){
                         String coins = requestTokens[3];
                         String validity = requestTokens[4];
-                        System.out.println("Key " + key + " -> NFT ID: " + nft + ", Coins: " + coins + ", Validity: " + validity);
+                        String value = requestTokens[5];
+                        System.out.println("Key " + key + " -> NFT ID: " + nft + ", Coins: " + coins + ", Validity: " + validity + ", Value: " + value);
                         found = true;
                     }
                 }

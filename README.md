@@ -46,5 +46,5 @@ Only user with **id=0** has permission to MINT.
 
 **MY_NFT_REQUESTS: ** List of all requests for a NFT.
 
-**PROCESS_NFT_TRANSFER: **
+**PROCESS_NFT_TRANSFER: ** Accept or reject the NFT transfer.
 

@@ -206,9 +206,11 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     boolean isDateValid = validator.isValid(requestTransfer[4]);
                     //ver monedas 
                     String[] requestCoins = requestTransfer[3].split(",");
-                    boolean areCoinsFromUser= false;
+                    boolean areCoinsFromUser = false;
+                    int coinsSumValue = 0;
                     for(int i = 0; i<requestCoins.length;i++){
                         areCoinsFromUser = isCoinFromUser(requestCoins[i], msgCtx.getSender());
+                  		coinsSumValue += Integer.parseInt(replicaMap.get(Integer.parseInt(requestCoins[i])).toString().split("\\|")[2]);
                     }
 
                     for (Map.Entry<K,V> _entry : replicaMap.entrySet()){
@@ -220,7 +222,7 @@ public class BFTMapServer<K, V> extends DefaultSingleRecoverable {
                     System.out.println(exists);
                     System.out.println(isDateValid);
                     System.out.println(areCoinsFromUser);
-                    if (exists && isDateValid && areCoinsFromUser){
+                    if (exists && isDateValid && areCoinsFromUser && coinsSumValue >= Integer.parseInt(requestTransfer[5])){
                         V oldV = replicaMap.put(request.getKey(), request.getValue());
                         System.out.println(replicaMap.get(request.getKey()));
                         if(oldV != null) {
